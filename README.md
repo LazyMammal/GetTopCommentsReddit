@@ -13,6 +13,7 @@ An example would be finding top submissions on /r/SketchDaily (where user submis
 PRAW:
 * https://praw.readthedocs.io/en/stable/
 * pip install praw
+* setup ~/.config/praw.ini
 
 
 # Usage

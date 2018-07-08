@@ -48,21 +48,19 @@ def main():
 
     # use generator to get all posts
     for post in get_all_posts(args.subreddit):
-        if post.name not in post_cache:
+        if isinstance(post, praw.models.reddit.submission.Submission) and post.name not in post_cache:
             post_cache[ post.name ] = post
             print post_details_json( post )
-            if int(post.num_comments) > 0:
-                # top-level comments
-                for comment in post.comments: # use praw.helpers.flatten_tree(post.comments) to also process sub-level comments
-                    # must be comment (not a readmore node)
-                    # must be above upvote threshold
-                    if isinstance(comment, praw.objects.Comment) and comment.ups > threshold:
-                        top_comments.append( comment )
-                # manage top_comments list
-                if len(top_comments) > (maxcomments + 20):
-                    top_comments.sort(key=lambda comment: comment.ups, reverse=True) # python sort() is very fast on partially sorted lists
-                    top_comments = top_comments[:maxcomments] # only keep top comments
-                    threshold = int(top_comments[-1].ups) # [-1] is okay because len() == maxcomments
+            for comment in post.comments: # use praw.helpers.flatten_tree(post.comments) to also process sub-level comments
+                # must be comment (not a readmore node)
+                # must be above upvote threshold
+                if isinstance(comment, praw.models.reddit.comment.Comment) and comment.ups > threshold:
+                    top_comments.append( comment )
+            # manage top_comments list
+            if len(top_comments) > (maxcomments + 20):
+                top_comments.sort(key=lambda comment: comment.ups, reverse=True) # python sort() is very fast on partially sorted lists
+                top_comments = top_comments[:maxcomments] # only keep top comments
+                threshold = int(top_comments[-1].ups) # [-1] is okay because len() == maxcomments
 
     # final size of top_comments list
     top_comments.sort(key=lambda comment: comment.ups, reverse=True)
